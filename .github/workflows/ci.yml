@@ -58,15 +58,15 @@ jobs:
         run: |
           PROJECT_PATH=${{ github.repository }}
           PROJECT_NAME="${PROJECT_PATH##*/}-int-test"
-          echo "PROJECT_NAME=${PROJECT_NAME}" >> $GITHUB_ENV
-          echo -e "Check if the project ${PROJECT_NAME} already exits, create it if needed."
+          echo "PROJECT_NAME=${PROJECT_NAME}" >> "$GITHUB_ENV"
+          echo -e "Check if the project "${PROJECT_NAME}" already exits, create it if needed."
           project_exist=$(gh repo list --json name --jq ".[] | select(.name | contains(\"${PROJECT_NAME}\")) | .name")
           if [[ -n $project_exist ]]; then
-            echo -e "==> The project ${PROJECT_NAME} already exits."
+            echo -e "==> The project "${PROJECT_NAME}" already exits."
           else
-            echo -e "==> The project ${PROJECT_NAME} is going to be created."
+            echo -e "==> The project "${PROJECT_NAME}" is going to be created."
             gh repo create $PROJECT_NAME --public
-            echo -e "==> The project ${PROJECT_NAME} is created."
+            echo -e "==> The project "${PROJECT_NAME}" is created."
           fi
           echo -e "Check if the project does not exits on TestSpace Side."
           http_response=$(curl -o response.txt -w "%{response_code}" --no-progress-meter -X GET -H "Authorization: Token ${TESTSPACE_TOKEN}" "https://fletort.testspace.com/api/projects")
