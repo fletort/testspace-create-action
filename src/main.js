@@ -1,5 +1,5 @@
 const core = require('@actions/core')
-const { wait } = require('./wait')
+const { createProject, getProjects } = require('./testspace-api')
 
 /**
  * The main function for the action.
@@ -7,18 +7,33 @@ const { wait } = require('./wait')
  */
 async function run() {
   try {
-    const ms = core.getInput('milliseconds', { required: true })
+    const repo = core.getInput('repository', { required: true })
+    const token = core.getInput('token', { required: true })
+    const domain = core.getInput('domain', { required: true })
 
     // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-    core.debug(`Waiting ${ms} milliseconds ...`)
+    core.debug(`Get Projects already defined`)
+    const projects = await getProjects(domain, token)
+    core.debug(`Defined Projects are ${projects}`)
 
-    // Log the current timestamp, wait, then log the new timestamp
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    let project = projects.find(
+      element => element.source_repo_url === `https://github.com/${repo}`
+    )
+    if (project === undefined) {
+      core.info(`TestSpace Project is going to be created`)
+      project = await createProject(domain, token, repo)
+      core.info(
+        `The TestSpace Project ${project.name} was created with id ${project.id}`
+      )
+    } else {
+      core.info(
+        `The TestSpace Project ${project.name} already exists with id ${project.id}`
+      )
+    }
 
     // Set outputs for other workflow steps to use
-    core.setOutput('time', new Date().toTimeString())
+    core.setOutput('id', project.id)
+    core.setOutput('name', project.name)
   } catch (error) {
     // Fail the workflow run if an error occurs
     core.setFailed(error.message)
