@@ -15,6 +15,10 @@ jobs:
   test-javascript:
     name: JavaScript Tests
     runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      pull-requests: write
+      contents: write
 
     steps:
       - name: Checkout
@@ -42,7 +46,9 @@ jobs:
 
       - name: Test
         id: npm-ci-test
-        run: npm run ci-test
+        uses: ArtiomTr/jest-coverage-report-action@v2
+        with:
+          skip-step: install
 
   test-action:
     name: GitHub Actions Test
