@@ -1,18 +1,27 @@
-name: 'The name of your action here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'TestSpace Project Creation'
+description: 'Create a TestSpace Project'
+author: 'fletort'
 
-# Define your inputs here.
 inputs:
-  milliseconds:
-    description: 'Your input description here'
+  repository:
+    description:
+      'Repository name with owner. For example, fletort/testspace-create-action'
+    default: ${{ github.repository }}
+  token:
+    description: >
+      Personal testspace token used to interact with the testspace API to create
+      the project.
     required: true
-    default: '1000'
+  domain:
+    description: >
+      Testspace SubDomain
+    default: ${{ github.repository_owner }}
 
-# Define your outputs here.
 outputs:
-  time:
-    description: 'Your output description here'
+  id:
+    description: 'Id of the created testspace project.'
+  name:
+    description: 'Name of the created testspace project.'
 
 runs:
   using: node20
