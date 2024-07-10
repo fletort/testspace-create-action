@@ -6225,9 +6225,7 @@ exports["default"] = _default;
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const core = __nccwpck_require__(2186)
-const { createProject, getProjects } = __nccwpck_require__(8487)
-
-const { wait } = __nccwpck_require__(1312)
+const { createProject, getProjects } = __nccwpck_require__(9357)
 
 /**
  * The main function for the action.
@@ -6245,9 +6243,9 @@ async function run() {
     core.debug(`Defined Projects are ${projects}`)
 
     let project = projects.find(
-      element => element.source_repo_url == `https://github.com/${repo}`
+      element => element.source_repo_url === `https://github.com/${repo}`
     )
-    if (project == undefined) {
+    if (project === undefined) {
       core.info(`TestSpace Project is going to be created`)
       project = await createProject(domain, token, repo)
       core.info(
@@ -6275,7 +6273,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 8487:
+/***/ 9357:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const core = __nccwpck_require__(2186)
@@ -6283,15 +6281,16 @@ const axios = __nccwpck_require__(8757)
 
 async function getProjects(domain, token) {
   try {
-    projects_res = await axios.get(
+    const projects_res = await axios.get(
       `https://${domain}.testspace.com/api/projects`,
       {
         headers: { Authorization: `Token ${token}` },
-        validateStatus: function (status) {
-          return status == 200
+        validateStatus(status) {
+          return status === 200
         }
       }
     )
+    return projects_res.data
   } catch (err) {
     // https://axios-http.com/fr/docs/handling_errors
     if (err.response) {
@@ -6309,12 +6308,11 @@ async function getProjects(domain, token) {
       throw new Error(`Internal Error: ${err.message}`)
     }
   }
-  return projects_res.data
 }
 
 async function createProject(domain, token, githubRepo) {
   try {
-    response = await axios.post(
+    const response = await axios.post(
       `https://${domain}.testspace.com/api/projects`,
       {
         name: githubRepo.replace('/', ':'),
@@ -6323,11 +6321,12 @@ async function createProject(domain, token, githubRepo) {
       },
       {
         headers: { Authorization: `Token ${token}` },
-        validateStatus: function (status) {
-          return status == 201
+        validateStatus(status) {
+          return status === 201
         }
       }
     )
+    return response.data
   } catch (err) {
     // https://axios-http.com/fr/docs/handling_errors
     if (err.response) {
@@ -6345,37 +6344,12 @@ async function createProject(domain, token, githubRepo) {
       throw new Error(`Internal Error: ${err.message}`)
     }
   }
-  return response.data
 }
 
 module.exports = {
   getProjects,
   createProject
 }
-
-
-/***/ }),
-
-/***/ 1312:
-/***/ ((module) => {
-
-/**
- * Wait for a number of milliseconds.
- *
- * @param {number} milliseconds The number of milliseconds to wait.
- * @returns {Promise<string>} Resolves with 'done!' after the wait is over.
- */
-async function wait(milliseconds) {
-  return new Promise(resolve => {
-    if (isNaN(milliseconds)) {
-      throw new Error('milliseconds not a number')
-    }
-
-    setTimeout(() => resolve('done!'), milliseconds)
-  })
-}
-
-module.exports = { wait }
 
 
 /***/ }),
