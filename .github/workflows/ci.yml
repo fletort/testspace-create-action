@@ -74,7 +74,10 @@ jobs:
 
       - name: Init Initial Integration Test Context
         id: test-context
-        run: __tests__/integration-test-init.sh
+        run: |
+          __tests__/integration-test-init.sh
+          echo "TESTCASE_CLASSNAME=testspace-create-action" >> "$GITHUB_OUTPUT"
+          echo "TESTCASE_START=`date +%s.%N`" >> "$GITHUB_OUTPUT"
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           TESTSPACE_TOKEN: ${{ secrets.TESTSPACE_TOKEN }}
@@ -90,6 +93,10 @@ jobs:
         id: output
         run: |
           echo "${{ steps.test-action-new.outputs.id }} - ${{steps.test-action-new.outputs.name }}"
+          TESTCASE_END=`date +%s.%N`
+          TESTCASE_TIME=$( echo "${TESTCASE_END} - ${TESTCASE_START}" | bc -l )
+          echo "<testcase classname="${TESTCASE_CLASSNAME}" name="Test Local Action On a new Project" time="${TESTCASE_TIME}"></testcase>" >> ci-test-report.xml 
+          echo "TESTCASE_START=`date +%s.%N`" >> "$GITHUB_OUTPUT"
 
       - name: Test Local Action on an existing Project
         id: test-action-existing
@@ -99,10 +106,14 @@ jobs:
           repository: ${{ github.repository_owner }}/${{ env.PROJECT_NAME }}
 
       - name: Check Than TestSpace project is the same
-        run: |
+        run: | 
+          TESTCASE_END=`date +%s.%N`
+          TESTCASE_TIME=$( echo "${TESTCASE_END} - ${TESTCASE_START}" | bc -l )
           if [[ ${{ steps.test-action-new.outputs.id }} == ${{steps.test-action-existing.outputs.id }} ]]; then
+            echo "<testcase classname="${TESTCASE_CLASSNAME}" name="Test Local Action on an existing Project" time="${TESTCASE_TIME}"></testcase>" >> ci-test-report.xml 
             exit 0
           else
+            echo "<testcase classname="${TESTCASE_CLASSNAME}" name="Test Local Action on an existing Project" time="${TESTCASE_TIME}"></testcase>" >> ci-test-report.xml 
             exit 1
           fi
 
@@ -112,3 +123,14 @@ jobs:
         env:
           TESTSPACE_TOKEN: ${{ secrets.TESTSPACE_TOKEN }}
           TESTSPACE_PROJECT_ID: ${{ steps.test-action-new.outputs.id }}
+
+      - name: Testspace client install & config
+        id: testspace_init
+        if: always() && hashFiles('ci-test-report.xml') != ''
+        uses: testspace-com/setup-testspace@v1
+        with:
+          domain: ${{github.repository_owner}}
+  
+      - name: Testspace push test content
+        if: always() && (steps.testspace_init.outcome == 'success')
+        run: testspace "[myFolder]ci-test-report.xml" 
