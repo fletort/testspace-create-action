@@ -2,7 +2,7 @@ version: 2
 updates:
   - package-ecosystem: github-actions
     directory: /
-    target-branch: 'develop'
+    target-branch: develop
     schedule:
       interval: weekly
     groups:
@@ -10,13 +10,26 @@ updates:
         update-types:
           - minor
           - patch
+      codeql-all:
+        patterns:
+          - 'github/codeql-action/*'
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: npm
     directory: /
-    target-branch: 'develop'
+    target-branch: develop
     schedule:
       interval: weekly
     groups:
+      eslint-major:
+        patterns:
+          - 'eslint'
+          - '@eslint/*'
+          - 'eslint-*'
+          - '@typescript-eslint/*'
+        update-types:
+          - major
       npm-development:
         dependency-type: development
         update-types:
@@ -26,3 +39,5 @@ updates:
         dependency-type: production
         update-types:
           - patch
+    cooldown:
+      default-days: 7

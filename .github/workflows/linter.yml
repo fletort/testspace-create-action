@@ -4,9 +4,11 @@ on:
   pull_request:
     branches:
       - main
+      - develop
   push:
     branches:
       - main
+      - develop
 
 permissions:
   contents: read
@@ -19,12 +21,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout the repository.
       - name: Checkout
         id: checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      # Setup Node.js using the version specified in `.node-version`.
       - name: Setup Node.js
         id: setup-node
         uses: actions/setup-node@v4
@@ -32,10 +36,12 @@ jobs:
           node-version-file: .node-version
           cache: npm
 
+      # Install dependencies using `npm ci`.
       - name: Install Dependencies
         id: install
         run: npm ci
 
+      # Lint the codebase using the `super-linter/super-linter` action.
       - name: Lint Codebase
         id: super-linter
         uses: super-linter/super-linter/slim@v7
