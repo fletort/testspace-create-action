@@ -36,7 +36,6 @@ const createdProject = {
 }
 
 // Spy the GitHub Actions core library
-const debugMock = jest.spyOn(core, 'debug').mockImplementation()
 const infoMock = jest.spyOn(core, 'info').mockImplementation()
 const getInputMock = jest.spyOn(core, 'getInput').mockImplementation()
 const setFailedMock = jest.spyOn(core, 'setFailed').mockImplementation()
@@ -52,8 +51,6 @@ getProjects.mockImplementation(() => Promise.resolve([existingProject]))
 createProject.mockImplementation(() => Promise.resolve(createdProject))
 
 // Other utilities
-const timeRegex = /^\d{2}:\d{2}:\d{2}/
-
 describe('action', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -61,7 +58,7 @@ describe('action', () => {
 
   it('create a new testspace projet if not existing', async () => {
     // Set the action's inputs as return values from core.getInput()
-    getInputMock.mockImplementation(name => {
+    getInputMock.mockImplementation((name) => {
       switch (name) {
         case 'repository':
           return repoToCreate
@@ -103,7 +100,7 @@ describe('action', () => {
 
   it('does not create a new testspace projet if existing', async () => {
     // Set the action's inputs as return values from core.getInput()
-    getInputMock.mockImplementation(name => {
+    getInputMock.mockImplementation((name) => {
       switch (name) {
         case 'repository':
           return repoAlreadyCreated
@@ -140,7 +137,7 @@ describe('action', () => {
 
   it('return error on get api problem', async () => {
     // Set the action's inputs as return values from core.getInput()
-    getInputMock.mockImplementation(name => {
+    getInputMock.mockImplementation((name) => {
       switch (name) {
         case 'repository':
           return repoToCreate
@@ -170,7 +167,7 @@ describe('action', () => {
 
   it('return error on create api problem', async () => {
     // Set the action's inputs as return values from core.getInput()
-    getInputMock.mockImplementation(name => {
+    getInputMock.mockImplementation((name) => {
       switch (name) {
         case 'repository':
           return repoToCreate
@@ -202,7 +199,7 @@ describe('action', () => {
 
   it('fails if no input is provided', async () => {
     // Set the action's inputs as return values from core.getInput()
-    getInputMock.mockImplementation(name => {
+    getInputMock.mockImplementation((name) => {
       switch (name) {
         case 'token':
           throw new Error('Input required and not supplied: token')

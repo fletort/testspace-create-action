@@ -10,7 +10,6 @@ jest.mock('axios')
 
 // Mock the GitHub Actions core library
 const core = require('@actions/core')
-const setFailedMock = jest.spyOn(core, 'setFailed').mockImplementation()
 
 describe('getProjects', () => {
   it('calls the correct url with token header and returns list of projects', async () => {

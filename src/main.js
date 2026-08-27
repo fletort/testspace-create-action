@@ -12,15 +12,15 @@ async function run() {
     const domain = core.getInput('domain', { required: true })
 
     // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-    core.debug(`Get Projects already defined`)
+    core.debug('Get Projects already defined')
     const projects = await getProjects(domain, token)
     core.debug(`Defined Projects are ${projects}`)
 
     let project = projects.find(
-      element => element.source_repo_url === `https://github.com/${repo}`
+      (element) => element.source_repo_url === `https://github.com/${repo}`
     )
     if (project === undefined) {
-      core.info(`TestSpace Project is going to be created`)
+      core.info('TestSpace Project is going to be created')
       project = await createProject(domain, token, repo)
       core.info(
         `The TestSpace Project ${project.name} was created with id ${project.id}`

@@ -1,9 +1,8 @@
-const core = require('@actions/core')
 const axios = require('axios')
 
 async function getProjects(domain, token) {
   try {
-    const projects_res = await axios.get(
+    const projectsRes = await axios.get(
       `https://${domain}.testspace.com/api/projects`,
       {
         headers: { Authorization: `Token ${token}` },
@@ -12,7 +11,7 @@ async function getProjects(domain, token) {
         }
       }
     )
-    return projects_res.data
+    return projectsRes.data
   } catch (err) {
     // https://axios-http.com/fr/docs/handling_errors
     if (err.response) {
